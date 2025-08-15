@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Full Stack Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --accent: #ff006e;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            scroll-behavior: smooth;
+        }
+
+        /* Canvas for 3D animations */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .active-link::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero-text {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .animate-word {
+            display: inline-block;
+            animation: bounce 0.5s ease infinite alternate;
+        }
+
+        .animate-word:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .animate-word:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .animate-word:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes bounce {
+            100% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes rainbow {
+
+            0%,
+            100% {
+                color: #3a86ff;
+            }
+
+            25% {
+                color: #8338ec;
+            }
+
+            50% {
+                color: #ff006e;
+            }
+
+            75% {
+                color: #fb5607;
+            }
+        }
+
+        .hero-btn {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(58, 134, 255, 0.5);
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(58, 134, 255, 0.8);
+        }
+
+        /* About Section */
+        .profile-img {
+            border-radius: 50%;
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 30px rgba(58, 134, 255, 0.5);
+            transition: all 0.5s ease;
+        }
+
+        .profile-img:hover {
+            transform: rotate(10deg) scale(1.05);
+            border-color: var(--accent);
+        }
+
+        /* Projects Section */
+        .project-card {
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            perspective: 1000px;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            clip-path: circle(0% at 100% 0);
+            transition: clip-path 0.5s ease;
+            z-index: 0;
+        }
+
+        .project-card:hover::before {
+            clip-path: circle(150% at 100% 0);
+        }
+
+        /* Skills Section */
+        .skill-item {
+            transition: all 0.3s ease;
+        }
+
+        .skill-item:hover {
+            transform: scale(1.1);
+        }
+
+        .skill-bar-container {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .skill-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 1s ease;
+        }
+
+        /* Contact Section */
+        .contact-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .contact-input:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(58, 134, 255, 0.5);
+        }
+
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            transform: translateY(-5px) scale(1.2);
+        }
+
+        /* Resume Section */
+        .timeline {
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--accent));
+        }
+
+        .timeline-item {
+            transition: all 0.5s ease;
+        }
+
+        .timeline-item:hover {
+            transform: scale(1.05);
+        }
+
+        /* Scroll Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px;
+            }
+
+            .profile-img {
+                width: 200px;
+                height: 200px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary), var(--secondary));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--accent), var(--primary));
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 3D Background Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-dark bg-opacity-80 backdrop-blur-md z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-white">
+                <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">PORTFOLIO</span>
+            </a>
+
+            <div class="hidden md:flex space-x-8">
+                <a href="code.html" class="nav-link active-link text-white">Home</a>
+                <a href="code.html" class="nav-link text-white">About</a>
+                <a href="code.html" class="nav-link text-white">Skills</a>
+                <a href="project.html" class="nav-link text-white">Projects</a>
+                <a href="code.html" class="nav-link text-white">Resume</a>
+                <a href="code.html" class="nav-link text-white">Contact</a>
+            </div>
+
+            <button id="menu-btn" class="md:hidden text-white focus:outline-none">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-dark bg-opacity-95 w-full pb-4 px-6">
+            <a href="code.html" class="block py-2 text-white hover:text-primary transition">Home</a>
+            <a href="code.html" class="block py-2 text-white hover:text-primary transition">About</a>
+            <a href="code.html" class="block py-2 text-white hover:text-primary transition">Skills</a>
+            <a href="project.html" class="block py-2 text-white hover:text-primary transition">Projects</a>
+            <a href="code.html" class="block py-2 text-white hover:text-primary transition">Resume</a>
+            <a href="code.html" class="block py-2 text-white hover:text-primary transition">Contact</a>
+        </div>
+    </nav>
+
+
+
+
+
+
+    <div class="reveal" style="padding-bottom: 20px; padding-top: 50px;">
+
+
+        <!-- Education Timeline Cards -->
+        <h3 class="text-2xl font-semibold text-white mb-8 mt-12 relative flex items-center"
+            style="padding-left: 600px;">
+            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center mr-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                    <path
+                        d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z">
+                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222">
+                    </path>
+                </svg>
+            </div>
+            About Me
+        </h3>
+        <div class="max-w-4xl mx-auto px-4 pb-10">
+            <p class="text-center text-white-800 bg-slate-100 p-6 pb-10 rounded-lg shadow"
+                style="background-color: rgb(31 41 55 / var(--tw-bg-opacity, 1));">
+                Dynamic web developer with practical full-stack development expertise using cutting-edge tools like
+                Node.js and MongoDB. I'm a strong team player and problem-solver who has improved user experience
+                and performance by successfully contributing to scalable online apps. Enthusiastic about promoting
+                efficiency and innovation in technological solutions. I developed a solid foundation in core computer
+                science topics including databases, software engineering, computer networks, algorithms, and data
+                structures.
+            </p>
+        </div>
+
+
+
+
+
+        <div
+            class="timeline-item ml-24 border border-gray-700 rounded-xl p-6 hover:border-primary transition bg-gray-800  max-w-6xl">
+            <span class="text-gray-400 block mb-1">• Shya Innovates</span>
+            <h4 class="text-xl font-bold text-white mb-2">Web Developer</h4>
+            <h5 class="text-primary font-medium mb-4">December 2024 - May 2025, Gwalior, Madhya Pradesh</h5>
+            <p class="text-gray-400">
+                I'm learning a lot about full-stack development and improving my front-end, back-end, and database
+                administration skills thanks to this internship. Working with cutting-edge technologies like Node.js,
+                Angular/React, Express.js, and MongoDB gives me real-world experience creating scalable, safe, and
+                effective web apps. Working with seasoned developers helps me prepare for real-world web development
+                challenges by teaching me best practices in API development, authentication, performance optimization,
+                and responsive UI design.
+            </p>
+        </div>
+        <br>
+        <div
+            class="timeline-item ml-24 max-w-6xl border border-gray-700 rounded-xl p-6 hover:border-primary transition bg-gray-800">
+            <span class="text-gray-400 block mb-1">• IntelligentBots</span>
+            <h4 class="text-xl font-bold text-white mb-2">STEM Trainee</h4>
+            <h5 class="text-primary font-medium mb-4">October 2022 – October 2023, Gwalior, Madhya Pradesh.</h5>
+            <p class="text-gray-400">
+                Leading robotics company IntelligentBots creates state-of-the-art automation solutions for sectors
+                like logistics, manufacturing, and healthcare. We are dedicated to fostering innovation and work to
+                improve production, safety, and efficiency by utilizing cutting-edge robotics technology. With the
+                help of our 2-month Robotics Stream Trainee internship, interns can work with professionals and
+                participate in practical automation projects while gaining practical experience in robotics engineering
+                and programming.
+            </p>
+        </div>
+        <!-- Skills Section same as About -->
+        <section
+            class="timeline-item ml-24 max-w-6xl border border-gray-700 rounded-xl p-6 hover:border-primary transition bg-gray-800 mt-5"
+            data-aos="fade-up">
+            <div class="max-w-4xl mx-auto px-4">
+                <!-- Heading centered -->
+                <h2 class="text-xl font-bold text-white mb-6 text-center">Skills</h2>
+
+                <!-- Content: Skills + Buttons side by side -->
+                <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-8">
+                    <!-- Skills List LEFT -->
+                    <div class="flex-1">
+                        <ul class="list-disc list-inside text-left text-lg space-y-2 text-xl font-bold text-white">
+                            <li>HTML5, CSS3</li>
+                            <li>Tailwind CSS, Bootstrap</li>
+                            <li>JavaScript</li>
+                            <li>React, Angular</li>
+                            <li>Node.js, Express.js</li>
+                            <li>MongoDB, SQL</li>
+                            <li>WordPress</li>
+                            <li>API Development & Authentication</li>
+                        </ul>
+                    </div>
+
+                    <!-- Buttons RIGHT, stacked -->
+                    <div class="flex flex-col items-end space-y-4">
+                        <button
+                            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-full shadow-lg hover:from-purple-700 hover:to-indigo-700 transform hover:scale-105 transition duration-300">
+                            Internship 
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                        <button
+                            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-full shadow-lg hover:from-purple-700 hover:to-indigo-700 transform hover:scale-105 transition duration-300">
+                            Education
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+
+                        <button
+                            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-full shadow-lg hover:from-purple-700 hover:to-indigo-700 transform hover:scale-105 transition duration-300">
+                            Documents
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <!-- Contact Section -->
+
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 px-6 py-6">
+
+        <!-- Bottom line -->
+        <div class="text-center text-s text-gray-500" data-aos="fade-up" data-aos-delay="300">
+            © 2025 @Ritik Mangal. All rights reserved.
+        </div>
+
+        <!-- Back to Top Button inside footer -->
+        <div>
+            <button id="back-to-top" class="fixed bottom-4 right-6"
+                style="background-color: #5f5fc0; border-radius: 20px; padding: 10px;"
+                class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white shadow-lg hover:bg-accent transition opacity-0 invisible">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                </svg>
+            </button>
+        </div>
+
+    </footer>
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Scripts -->
+    <script>
+        // Name rainbow animation
+        const name = document.querySelector('.hero-text span');
+        let hue = 0;
+        setInterval(() => {
+            hue = (hue + 1) % 360;
+            name.style.color = `hsl(${hue}, 100%, 50%)`;
+        }, 50);
+
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+
+                    // Close mobile menu if open
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+
+        // Highlight Active Nav Link on Scroll
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+
+                if (pageYOffset >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active-link');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active-link');
+                }
+            });
+
+            // Show/hide back to top button
+            const backToTop = document.getElementById('back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.classList.remove('opacity-0', 'invisible');
+                backToTop.classList.add('opacity-100', 'visible');
+            } else {
+                backToTop.classList.remove('opacity-100', 'visible');
+                backToTop.classList.add('opacity-0', 'invisible');
+            }
+        });
+
+        // Back to Top Button
+        document.getElementById('back-to-top').addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Scroll Animation
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = () => {
+            revealElements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        window.addEventListener('load', revealOnScroll);
+
+        // 3D Background Animation
+        const canvasContainer = document.getElementById('canvas-container');
+        let canvas, scene, camera, renderer, particles;
+
+        const initThreeJS = () => {
+            // Create scene
+            scene = new THREE.Scene();
+
+            // Create camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+
+            // Create renderer
+            canvas = document.createElement('canvas');
+            renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            canvasContainer.appendChild(renderer.domElement);
+
+            // Create particles
+            const particleCount = 1500;
+            particles = new THREE.BufferGeometry();
+
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 200;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
+
+                colors[i * 3] = 0.2 + Math.random() * 0.3; // R
+                colors[i * 3 + 1] = 0.5 + Math.random() * 0.3; // G
+                colors[i * 3 + 2] = 0.9 + Math.random() * 0.1; // B
+            }
+
+            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const particleMaterial = new THREE.PointsMaterial({
+                size: 1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true
+            });
+
+            const particleMesh = new THREE.Points(particles, particleMaterial);
+            scene.add(particleMesh);
+
+            // Animation loop
+            const animate = () => {
+                requestAnimationFrame(animate);
+
+                particleMesh.rotation.x += 0.0005;
+                particleMesh.rotation.y += 0.001;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+        };
+
+        // Handle window resize
+        const handleResize = () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Reveal elements on load
+            revealOnScroll();
+
+            // Initialize 3D background
+            initThreeJS();
+        });
+    </script>
+</body>
+
+</html>

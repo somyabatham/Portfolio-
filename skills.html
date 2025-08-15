@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Full Stack Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --accent: #ff006e;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            scroll-behavior: smooth;
+        }
+
+        /* Canvas for 3D animations */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .active-link::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero-text {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .animate-word {
+            display: inline-block;
+            animation: bounce 0.5s ease infinite alternate;
+        }
+
+        .animate-word:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .animate-word:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .animate-word:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes bounce {
+            100% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes rainbow {
+
+            0%,
+            100% {
+                color: #3a86ff;
+            }
+
+            25% {
+                color: #8338ec;
+            }
+
+            50% {
+                color: #ff006e;
+            }
+
+            75% {
+                color: #fb5607;
+            }
+        }
+
+        .hero-btn {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(58, 134, 255, 0.5);
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(58, 134, 255, 0.8);
+        }
+
+        /* About Section */
+        .profile-img {
+            border-radius: 50%;
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 30px rgba(58, 134, 255, 0.5);
+            transition: all 0.5s ease;
+        }
+
+        .profile-img:hover {
+            transform: rotate(10deg) scale(1.05);
+            border-color: var(--accent);
+        }
+
+        /* Projects Section */
+        .project-card {
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            perspective: 1000px;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            clip-path: circle(0% at 100% 0);
+            transition: clip-path 0.5s ease;
+            z-index: 0;
+        }
+
+        .project-card:hover::before {
+            clip-path: circle(150% at 100% 0);
+        }
+
+        /* Skills Section */
+        .skill-item {
+            transition: all 0.3s ease;
+        }
+
+        .skill-item:hover {
+            transform: scale(1.1);
+        }
+
+        .skill-bar-container {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .skill-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 1s ease;
+        }
+
+        /* Contact Section */
+        .contact-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .contact-input:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(58, 134, 255, 0.5);
+        }
+
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            transform: translateY(-5px) scale(1.2);
+        }
+
+        /* Resume Section */
+        .timeline {
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--accent));
+        }
+
+        .timeline-item {
+            transition: all 0.5s ease;
+        }
+
+        .timeline-item:hover {
+            transform: scale(1.05);
+        }
+
+        /* Scroll Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px;
+            }
+
+            .profile-img {
+                width: 200px;
+                height: 200px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary), var(--secondary));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--accent), var(--primary));
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 3D Background Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-dark bg-opacity-80 backdrop-blur-md z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-white">
+                <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">PORTFOLIO</span>
+            </a>
+
+            <div class="hidden md:flex space-x-8">
+                <a href="code.html" class="nav-link active-link text-white">Home</a>
+                <a href="about.html" class="nav-link text-white">About</a>
+                <a href="skills.html" class="nav-link text-white">Skills</a>
+                <a href="project.html" class="nav-link text-white">Projects</a>
+                <a href="code.html" class="nav-link text-white">Resume</a>
+                <a href="code.html" class="nav-link text-white">Contact</a>
+            </div>
+
+            <button id="menu-btn" class="md:hidden text-white focus:outline-none">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-dark bg-opacity-95 w-full pb-4 px-6">
+            <a href="code.html" class="block py-2 text-white hover:text-primary transition">Home</a>
+            <a href="about.html" class="block py-2 text-white hover:text-primary transition">About</a>
+            <a href="skills.html" class="block py-2 text-white hover:text-primary transition">Skills</a>
+            <a href="project.html" class="block py-2 text-white hover:text-primary transition">Projects</a>
+            <a href="code.html" class="block py-2 text-white hover:text-primary transition">Resume</a>
+            <a href="code.html" class="block py-2 text-white hover:text-primary transition">Contact</a>
+        </div>
+    </nav>
+
+
+
+
+
+
+
+
+    <section id="skills" class="py-20 px-6 bg-gray-900 text-white">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
+                My <span class="text-primary">Skills</span>
+            </h2>
+
+            <!-- 🔵 Frontend Skills -->
+            <div class="mb-16">
+                <h3 class="text-2xl font-semibold mb-8 border-b border-gray-700 pb-2">Frontend Skills</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                    <!-- HTML5 -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/732/732212.png" alt="HTML5"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">HTML5</h4>
+                        <p class="text-sm text-gray-400">Used to structure web content using tags like headings,
+                            paragraphs, and forms.</p>
+                    </div>
+
+                    <!-- CSS3 -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/732/732190.png" alt="CSS3"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">CSS3</h4>
+                        <p class="text-sm text-gray-400">Provides styling, layout control, animations, and design to
+                            HTML elements.</p>
+                    </div>
+
+                    <!-- JavaScript -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968292.png" alt="JavaScript"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">JavaScript</h4>
+                        <p class="text-sm text-gray-400">Enables interactivity like sliders, form validation, and
+                            dynamic updates.</p>
+                    </div>
+
+                    <!-- WordPress -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/174/174881.png" alt="WordPress"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">WordPress</h4>
+                        <p class="text-sm text-gray-400">CMS platform used to build websites and blogs easily using
+                            themes and plugins.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🧩 Framework Skills -->
+            <div class="mb-16">
+                <h3 class="text-2xl font-semibold mb-8 border-b border-gray-700 pb-2">Framework Skills</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                    <!-- React.js -->
+                    <!-- <div class="bg-gray-800 rounded-xl p-6 text-center">
+          <img src="https://cdn-icons-png.flaticon.com/512/1126/1126012.png" alt="React.js" class="w-12 h-12 mx-auto mb-4">
+          <h4 class="text-lg font-bold mb-2">React.js</h4>
+          <p class="text-sm text-gray-400">Build reusable UI components and create fast single-page applications.</p>
+        </div> -->
+
+                    <!-- Angular.js -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Angular"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">Angular.js</h4>
+                        <p class="text-sm text-gray-400">Framework for scalable web apps using two-way binding and
+                            TypeScript.</p>
+                    </div>
+
+                    <!-- Bootstrap -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968705.png" alt="Bootstrap"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">Bootstrap</h4>
+                        <p class="text-sm text-gray-400">Popular CSS framework for fast and responsive design using
+                            prebuilt components.</p>
+                    </div>
+
+                    <!-- Tailwind CSS -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968381.png" alt="Tailwind CSS"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">Tailwind CSS</h4>
+                        <p class="text-sm text-gray-400">Utility-first CSS framework for building modern, custom
+                            interfaces quickly.</p>
+                    </div>
+
+                    <!-- Express.js -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/919/919836.png" alt="Express.js"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">Express.js</h4>
+                        <p class="text-sm text-gray-400">Minimal Node.js web application framework for APIs and backend
+                            logic.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🟢 Backend Skills -->
+            <div class="mb-16">
+                <h3 class="text-2xl font-semibold mb-8 border-b border-gray-700 pb-2">Backend Skills</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                    <!-- Node.js -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/919/919825.png" alt="Node.js"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">Node.js</h4>
+                        <p class="text-sm text-gray-400">JavaScript runtime to build scalable and efficient backend
+                            services and APIs.</p>
+                    </div>
+
+                    <!-- REST API -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5815/5815742.png" alt="REST API"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">REST API</h4>
+                        <p class="text-sm text-gray-400">Interface for connecting frontend to backend using HTTP methods
+                            like GET/POST.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🗄️ Database Skills -->
+            <div>
+                <h3 class="text-2xl font-semibold mb-8 border-b border-gray-700 pb-2">Database Skills</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                    <!-- MongoDB -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/919/919836.png" alt="MongoDB"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">MongoDB</h4>
+                        <p class="text-sm text-gray-400">NoSQL database storing data as flexible JSON-like documents for
+                            scalability.</p>
+                    </div>
+
+                    <!-- MySQL -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968313.png" alt="MySQL"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">MySQL</h4>
+                        <p class="text-sm text-gray-400">Relational database system using SQL for efficient structured
+                            data management.</p>
+                    </div>
+
+                    <!-- Firebase -->
+                    <div class="bg-gray-800 rounded-xl p-6 text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/732/732228.png" alt="Firebase"
+                            class="w-12 h-12 mx-auto mb-4">
+                        <h4 class="text-lg font-bold mb-2">Firebase</h4>
+                        <p class="text-sm text-gray-400">Cloud NoSQL database for real-time sync, hosting, and
+                            authentication.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+
+
+
+
+
+    <!-- Contact Section -->
+
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 px-6 py-6">
+
+        <!-- Bottom line -->
+        <div class="text-center text-s text-gray-500" data-aos="fade-up" data-aos-delay="300">
+            © 2025 @Ritik Mangal. All rights reserved.
+        </div>
+
+        <!-- Back to Top Button inside footer -->
+        <div>
+            <button id="back-to-top" class="fixed bottom-4 right-6"
+                style="background-color: #5f5fc0; border-radius: 20px; padding: 10px;"
+                class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white shadow-lg hover:bg-accent transition opacity-0 invisible">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                </svg>
+            </button>
+        </div>
+
+    </footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Scripts -->
+    <script>
+        // Name rainbow animation
+        const name = document.querySelector('.hero-text span');
+        let hue = 0;
+        setInterval(() => {
+            hue = (hue + 1) % 360;
+            name.style.color = `hsl(${hue}, 100%, 50%)`;
+        }, 50);
+
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+
+                    // Close mobile menu if open
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+
+        // Highlight Active Nav Link on Scroll
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+
+                if (pageYOffset >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active-link');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active-link');
+                }
+            });
+
+            // Show/hide back to top button
+            const backToTop = document.getElementById('back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.classList.remove('opacity-0', 'invisible');
+                backToTop.classList.add('opacity-100', 'visible');
+            } else {
+                backToTop.classList.remove('opacity-100', 'visible');
+                backToTop.classList.add('opacity-0', 'invisible');
+            }
+        });
+
+        // Back to Top Button
+        document.getElementById('back-to-top').addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Scroll Animation
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = () => {
+            revealElements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        window.addEventListener('load', revealOnScroll);
+
+        // 3D Background Animation
+        const canvasContainer = document.getElementById('canvas-container');
+        let canvas, scene, camera, renderer, particles;
+
+        const initThreeJS = () => {
+            // Create scene
+            scene = new THREE.Scene();
+
+            // Create camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+
+            // Create renderer
+            canvas = document.createElement('canvas');
+            renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            canvasContainer.appendChild(renderer.domElement);
+
+            // Create particles
+            const particleCount = 1500;
+            particles = new THREE.BufferGeometry();
+
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 200;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
+
+                colors[i * 3] = 0.2 + Math.random() * 0.3; // R
+                colors[i * 3 + 1] = 0.5 + Math.random() * 0.3; // G
+                colors[i * 3 + 2] = 0.9 + Math.random() * 0.1; // B
+            }
+
+            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const particleMaterial = new THREE.PointsMaterial({
+                size: 1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true
+            });
+
+            const particleMesh = new THREE.Points(particles, particleMaterial);
+            scene.add(particleMesh);
+
+            // Animation loop
+            const animate = () => {
+                requestAnimationFrame(animate);
+
+                particleMesh.rotation.x += 0.0005;
+                particleMesh.rotation.y += 0.001;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+        };
+
+        // Handle window resize
+        const handleResize = () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Reveal elements on load
+            revealOnScroll();
+
+            // Initialize 3D background
+            initThreeJS();
+        });
+    </script>
+</body>
+
+</html>

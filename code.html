@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Full Stack Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --accent: #ff006e;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            scroll-behavior: smooth;
+        }
+
+        /* Canvas for 3D animations */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .active-link::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero-text {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .animate-word {
+            display: inline-block;
+            animation: bounce 0.5s ease infinite alternate;
+        }
+
+        .animate-word:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .animate-word:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .animate-word:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes bounce {
+            100% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes rainbow {
+
+            0%,
+            100% {
+                color: #3a86ff;
+            }
+
+            25% {
+                color: #8338ec;
+            }
+
+            50% {
+                color: #ff006e;
+            }
+
+            75% {
+                color: #fb5607;
+            }
+        }
+
+        .hero-btn {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(58, 134, 255, 0.5);
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(58, 134, 255, 0.8);
+        }
+
+        /* About Section */
+        .profile-img {
+            border-radius: 50%;
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 30px rgba(58, 134, 255, 0.5);
+            transition: all 0.5s ease;
+        }
+
+        .profile-img:hover {
+            transform: rotate(10deg) scale(1.05);
+            border-color: var(--accent);
+        }
+
+        /* Projects Section */
+        .project-card {
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            perspective: 1000px;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            clip-path: circle(0% at 100% 0);
+            transition: clip-path 0.5s ease;
+            z-index: 0;
+        }
+
+        .project-card:hover::before {
+            clip-path: circle(150% at 100% 0);
+        }
+
+        /* Skills Section */
+        .skill-item {
+            transition: all 0.3s ease;
+        }
+
+        .skill-item:hover {
+            transform: scale(1.1);
+        }
+
+        .skill-bar-container {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .skill-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 1s ease;
+        }
+
+        /* Contact Section */
+        .contact-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .contact-input:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(58, 134, 255, 0.5);
+        }
+
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            transform: translateY(-5px) scale(1.2);
+        }
+
+        /* Resume Section */
+        .timeline {
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--accent));
+        }
+
+        .timeline-item {
+            transition: all 0.5s ease;
+        }
+
+        .timeline-item:hover {
+            transform: scale(1.05);
+        }
+
+        /* Scroll Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px;
+            }
+
+            .profile-img {
+                width: 200px;
+                height: 200px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary), var(--secondary));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--accent), var(--primary));
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 3D Background Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-dark bg-opacity-80 backdrop-blur-md z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-white">
+                <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">PORTFOLIO</span>
+            </a>
+
+            <div class="hidden md:flex space-x-8">
+                <a href="#home" class="nav-link active-link text-white">Home</a>
+                <a href="#about" class="nav-link text-white">About</a>
+                <a href="#skills" class="nav-link text-white">Skills</a>
+                <a href="#projects" class="nav-link text-white">Projects</a>
+                <a href="#resume" class="nav-link text-white">Resume</a>
+                <a href="#contact" class="nav-link text-white">Contact</a>
+            </div>
+
+            <button id="menu-btn" class="md:hidden text-white focus:outline-none">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-dark bg-opacity-95 w-full pb-4 px-6">
+            <a href="#home" class="block py-2 text-white hover:text-primary transition">Home</a>
+            <a href="#about" class="block py-2 text-white hover:text-primary transition">About</a>
+            <a href="#skills" class="block py-2 text-white hover:text-primary transition">Skills</a>
+            <a href="#projects" class="block py-2 text-white hover:text-primary transition">Projects</a>
+            <a href="#resume" class="block py-2 text-white hover:text-primary transition">Resume</a>
+            <a href="#contact" class="block py-2 text-white hover:text-primary transition">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex items-center justify-center px-6 pt-20 pb-10">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="text-center md:text-left">
+                <h1 class="text-4xl md:text-6xl font-bold mb-4 hero-text reveal">
+                    Hi, I'm <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent relative"
+                        style="outline: rgb(0, 0, 0) dotted 3px; outline-offset: 1px;">
+                        <span class="animate-word">R</span>
+                        <span class="animate-word">I</span>
+                        <span class="animate-word">T</span>
+                        <span class="animate-word">I</span>
+                        <span class="animate-word">K</span>
+
+
+                        <span
+                            class="absolute inset-0 bg-gradient-to-r from-primary to-accent blur-lg opacity-30"></span>
+                    </span>
+                </h1>
+                <h2 class="text-2xl md:text-3xl mb-6 text-primary font-semibold reveal">
+                    Full Stack Developer
+                </h2>
+                <p class="text-lg md:text-xl mb-8 text-gray-300 reveal">
+                    I use state-of-the-art technologies and user-friendly interfaces to create outstanding digital
+                    experiences.
+                </p>
+                <div
+                    class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 justify-center md:justify-start reveal">
+                    <a href="#contact"
+                        class="hero-btn bg-primary hover:bg-accent text-white px-8 py-3 rounded-full font-medium transition">
+                        Hire Me
+                    </a>
+                    <a href="Resume_ritik.pdf"
+                        class="hero-btn bg-transparent border-2 border-primary text-white hover:bg-primary px-8 py-3 rounded-full font-medium transition">
+                        View Resume
+                    </a>
+                </div>
+            </div>
+
+            <div class="flex justify-center reveal">
+                <img src="ritik_img.jpg" alt="3D animated developer illustration with futuristic interface elements"
+                    class="profile-img w-72 h-72 md:w-80 md:h-80 lg:w-96 lg:h-96">
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-6 bg-dark">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-6 reveal">
+                About <span class="text-primary">Me</span>
+            </h2>
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="reveal lg:w-1/3 flex justify-center">
+                    <img src="ritik_img.jpg"
+                        alt="Professional portrait of a developer with futuristic UI elements in the background"
+                        class="profile-img w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80">
+                </div>
+
+                <div class="reveal lg:w-2/3">
+                    <h3 class="text-2xl font-semibold text-primary mb-4">
+                        Who I Am
+                    </h3>
+                    <p class="text-gray-300 mb-6">
+                        I create top-notch online applications by fusing my technical know-how with innovative
+                        problem-solving techniques. I started my career with a love of technology and design, and I've
+                        since finished more than 50 projects, from intricate enterprise apps to small company websites.
+                    </p>
+                    <p class="text-gray-300 mb-8">
+                        My proficiency in both front-end and back-end programming allows me to connect powerful
+                        functionality with aesthetically pleasing interfaces. I'm determined to be on the cutting edge
+                        of new technologies while preserving a solid understanding of the fundamentals of web
+                        development.
+                    </p>
+                    <a href="about.html"
+                        class="hero-btn bg-transparent border-2 border-primary text-white hover:bg-primary px-8 py-3 rounded-full font-medium transition">
+                        Read More
+                    </a>
+
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-20 px-6 bg-gray-900">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16 reveal">
+                My <span class="text-primary">Skills</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8" style="padding-left: 50px;">
+                <!-- Technical Skills -->
+                <div class="reveal">
+                    <h3 class="text-2xl font-semibold text-white mb-6 flex items-center">
+                        <svg class="w-8 h-8 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
+                        Technical Skills
+                    </h3>
+
+                    <div class="space-y-5">
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-1">
+                                <span>HTML5/CSS3</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-1">
+                                <span>JavaScript</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar" style="width: 95%"></div>
+                            </div>
+                        </div>
+
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-1">
+                                <span>React.js</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-1">
+                                <span>Angular.js</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar" style="width: 90%"></div>
+                            </div>
+                        </div>
+
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-1">
+                                <span>Node.js</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar" style="width: 85%"></div>
+                            </div>
+                        </div>
+
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-1">
+                                <span>Express.Js</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-1">
+                                <span>WordPress</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-1">
+                                <span>MongoDb</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="skill-bar-container">
+                                <div class="skill-bar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Download Resume Button -->
+                    <div class="mt-8 text-center">
+                        <a href="skills.html"
+                            class="hero-btn bg-transparent border-2 border-primary text-white hover:bg-primary px-8 py-3 rounded-full font-medium transition">
+                            Read More
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Design Skills -->
+              <div class="reveal max-w-xl mx-auto">
+    <!-- Heading -->
+    <h3 class="text-2xl font-semibold text-white mb-6 flex items-center">
+        <svg class="w-8 h-8 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z">
+            </path>
+        </svg>
+        Design & Tools
+    </h3>
+
+    <!-- Skills Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-xs sm:max-w-xl mx-auto">
+        
+        <!-- Figma -->
+        <div class="bg-gray-800 rounded-lg p-4 flex items-center hover:bg-gray-700 transition">
+            <svg class="w-8 h-8 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4z" />
+            </svg>
+            <div>
+                <h4 class="font-medium">Figma</h4>
+                <p class="text-sm text-gray-400">UI/UX Design</p>
+            </div>
+        </div>
+
+        <!-- Material UI -->
+        <div class="bg-gray-800 rounded-lg p-4 flex items-center hover:bg-gray-700 transition">
+            <svg class="w-8 h-8 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4v16m8-8H4" />
+            </svg>
+            <div>
+                <h4 class="font-medium">Material UI</h4>
+                <p class="text-sm text-gray-400">Icons Design</p>
+            </div>
+        </div>
+
+        <!-- Google Fonts -->
+        <div class="bg-gray-800 rounded-lg p-4 flex items-center hover:bg-gray-700 transition">
+            <svg class="w-8 h-8 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 4h18v16H3z" />
+            </svg>
+            <div>
+                <h4 class="font-medium">Google Fonts</h4>
+                <p class="text-sm text-gray-400">Text Fonts</p>
+            </div>
+        </div>
+
+        <!-- Git -->
+        <div class="bg-gray-800 rounded-lg p-4 flex items-center hover:bg-gray-700 transition">
+            <svg class="w-8 h-8 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            <div>
+                <h4 class="font-medium">Git</h4>
+                <p class="text-sm text-gray-400">Version Control</p>
+            </div>
+        </div>
+
+        <!-- VS Code -->
+        <div class="bg-gray-800 rounded-lg p-4 flex items-center hover:bg-gray-700 transition">
+            <svg class="w-8 h-8 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 21h7a2 2 0 002-2V9.4l-5.4-5.4A1 1 0 0012.6 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            <div>
+                <h4 class="font-medium">VS Code</h4>
+                <p class="text-sm text-gray-400">Code Editor</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 px-6 bg-dark">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-6 reveal">
+                Featured <span class="text-primary">Projects</span>
+            </h2>
+            <p class="text-center text-gray-400 mb-16 max-w-2xl mx-auto reveal">
+                A selection of projects I've worked on, demonstrating my skills and experience across different
+                technologies.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Project 1 -->
+                <div class="project-card bg-gray-800 rounded-xl p-6 relative overflow-hidden reveal">
+                    <div class="relative overflow-hidden rounded-lg mb-6 h-48">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c03015c2-b311-41cd-a0c3-2b1f3f244945.png"
+                            alt="E-commerce dashboard with analytics charts and product management interface"
+                            class="w-full h-full object-cover transition duration-500 hover:scale-110">
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-xl font-bold mb-2 text-white">Shopify Dashboard</h3>
+                        <p class="text-gray-400 mb-4">
+                            Comprehensive e-commerce dashboard with real-time analytics and inventory management.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-gray-700 text-primary text-xs px-3 py-1 rounded-full">React</span>
+                            <span class="bg-gray-700 text-primary text-xs px-3 py-1 rounded-full">Node.js</span>
+                            <span class="bg-gray-700 text-primary text-xs px-3 py-1 rounded-full">MongoDB</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <a href="#" class="text-primary font-medium hover:text-accent transition">Live Demo</a>
+                            <a href="#" class="text-gray-400 hover:text-white transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                    </path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card bg-gray-800 rounded-xl p-6 relative overflow-hidden reveal">
+                    <div class="relative overflow-hidden rounded-lg mb-6 h-48">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e528c96c-cbe5-445e-9222-7d8162ff384e.png"
+                            alt="Social media mobile app interface showing user profile and posts"
+                            class="w-full h-full object-cover transition duration-500 hover:scale-110">
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-xl font-bold mb-2 text-white">Social Media App</h3>
+                        <p class="text-gray-400 mb-4">
+                            Feature-rich social networking platform with real-time chat and content sharing.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-gray-700 text-primary text-xs px-3 py-1 rounded-full">React Native</span>
+                            <span class="bg-gray-700 text-primary text-xs px-3 py-1 rounded-full">Firebase</span>
+                            <span class="bg-gray-700 text-primary text-xs px-3 py-1 rounded-full">Redux</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <a href="#" class="text-primary font-medium hover:text-accent transition">Live Demo</a>
+                            <a href="#" class="text-gray-400 hover:text-white transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                    </path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card bg-gray-800 rounded-xl p-6 relative overflow-hidden reveal">
+                    <div class="relative overflow-hidden rounded-lg mb-6 h-48">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/9568ad61-be29-4b46-98c7-db18c0477bd6.png"
+                            alt="Healthcare platform showing appointment scheduling and doctor profiles"
+                            class="w-full h-full object-cover transition duration-500 hover:scale-110">
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-xl font-bold mb-2 text-white">HealthCare Portal</h3>
+                        <p class="text-gray-400 mb-4">
+                            Patient management system with appointment scheduling and telemedicine features.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-gray-700 text-primary text-xs px-3 py-1 rounded-full">Angular</span>
+                            <span class="bg-gray-700 text-primary text-xs px-3 py-1 rounded-full">NestJS</span>
+                            <span class="bg-gray-700 text-primary text-xs px-3 py-1 rounded-full">PostgreSQL</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <a href="#" class="text-primary font-medium hover:text-accent transition">Live Demo</a>
+                            <a href="#" class="text-gray-400 hover:text-white transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                    </path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-16 reveal">
+                <a href="project.html"
+                    class="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl hover:from-purple-600 hover:to-pink-600">
+
+                    <span class="mr-0"> View All Projects</span>
+
+                </a>
+            </div>
+
+
+        </div>
+    </section>
+
+    <!-- Resume Section -->
+    <section id="resume" class="py-20 px-6 bg-gray-900">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-6 reveal">
+                My <span class="text-primary">Resume</span>
+            </h2>
+            <p class="text-center text-gray-400 mb-14 max-w-2xl mx-auto reveal">
+                My professional journey and academic background in the field of web development.
+            </p>
+
+            <div class="timeline pr-8 md">
+                <!-- Experience -->
+                <div class="mb-20 reveal">
+                    <h3 class="text-2xl font-semibold text-white mb-8 relative flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        Experience
+                    </h3>
+
+                    <div
+                        class="timeline-item ml-14 border border-gray-700 rounded-xl p-6 hover:border-primary transition bg-gray-800">
+                        <span class="text-gray-400 block mb-1">2024 - 2025</span>
+                        <h4 class="text-xl font-bold text-white mb-2"> Full Stack Developer</h4>
+                        <h5 class="text-primary font-medium mb-4">Shya Innovative</h5>
+                        <p class="text-gray-400">
+                            By using Node.js, Angular/React, Express.js, and MongoDB to create safe, scalable web
+                            applications, I'm honing my full-stack abilities.
+                            I'm learning best practices for responsive UI design and API development by working with
+                            seasoned devs.
+                        </p>
+                    </div>
+
+                    <div
+                        class="timeline-item ml-14 border border-gray-700 rounded-xl p-6 hover:border-primary transition bg-gray-800 mt-4">
+                        <span class="text-gray-400 block mb-1">OCT-2022 - DEC-2022</span>
+                        <h4 class="text-xl font-bold text-white mb-2">Robotics(Stem Trainee)</h4>
+                        <h5 class="text-primary font-medium mb-4">IntelligentBots</h5>
+                        <p class="text-gray-400">
+                            IntelligentBots provides cutting-edge automation solutions to improve efficiency,
+                            production, and safety in a variety of industries.
+                            Working with professionals in the field, their two-month Robotics Stem Trainee internship
+                            provides practical exposure in robotics engineering and programming.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Education -->
+                <div class="reveal">
+                    <h3 class="text-2xl font-semibold text-white mb-8 relative flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                                <path
+                                    d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222">
+                                </path>
+                            </svg>
+                        </div>
+                        Education
+                    </h3>
+
+                    <div
+                        class="timeline-item ml-14 border border-gray-700 rounded-xl p-6 hover:border-primary transition bg-gray-800">
+                        <span class="text-gray-400 block mb-1">2020 - 2024</span>
+                        <h4 class="text-xl font-bold text-white mb-2">Bachelor of Technology</h4>
+                        <h5 class="text-primary font-medium mb-4">Shriram Institute of Information Technology (RGPV
+                            Bhopal) </h5>
+                        <p class="text-gray-400">
+                            focused on software engineering and web technologies. Completed dissertation titled
+                            "Optimizing Frontend Performance in Single Page Applications" .
+                        </p>
+                    </div>
+                    <br>
+                    <div
+                        class="timeline-item ml-14 border border-gray-700 rounded-xl p-6 hover:border-primary transition bg-gray-800">
+                        <span class="text-gray-400 block mb-1">2019 - 2020</span>
+                        <h4 class="text-xl font-bold text-white mb-2">12th (PCM)</h4>
+                        <h5 class="text-primary font-medium mb-4">Padma Girls Higher Secondary School, Gwalior </h5>
+                        <p class="text-gray-400">
+                            I have a solid foundation in analytical thinking, logical reasoning, and problem-solving
+                            because I finished my 12th grade in the Science stream with Physics, Chemistry, and
+                            Mathematics (PCM). My advancement in software development and web technologies has been made
+                            possible by this background, which has also helped me cultivate a strong interest in
+                            engineering concepts and technology.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="text-center mt-16 reveal">
+                <a href="Resume_ritik.pdf" download="Ritik_Mangal" id="downloadBtn"
+                    class="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl hover:from-purple-600 hover:to-pink-600">
+                    <span id="downloadText" class="mr-2">Download Resume</span>
+                    <svg id="downloadIcon" class="w-5 h-5 transition-transform duration-300 group-hover:translate-y-1"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 px-6 bg-dark">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-6 reveal">
+                Get In <span class="text-primary">Touch</span>
+            </h2>
+            <p class="text-center text-gray-400 mb-14 max-w-2xl mx-auto reveal">
+                Have a project in mind or want to discuss potential opportunities? Feel free to reach out!
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Contact Form -->
+                <div class="reveal h-full">
+                    <form class="bg-gray-800 rounded-xl p-8 h-full ">
+                        <div class="mb-6">
+                            <label for="name" class="block text-gray-300 mb-2">Your Name</label>
+                            <input type="text" id="name"
+                                class="contact-input w-full px-4 py-3 rounded-lg border border-gray-700 focus:outline-none focus:border-primary">
+                        </div>
+
+                        <div class="mb-6">
+                            <label for="email" class="block text-gray-300 mb-2">Email Address</label>
+                            <input type="email" id="email"
+                                class="contact-input w-full px-4 py-3 rounded-lg border border-gray-700 focus:outline-none focus:border-primary">
+                        </div>
+
+                        <div class="mb-6">
+                            <label for="subject" class="block text-gray-300 mb-2">Subject</label>
+                            <input type="text" id="subject"
+                                class="contact-input w-full px-4 py-3 rounded-lg border border-gray-700 focus:outline-none focus:border-primary">
+                        </div>
+
+                        <div class="mb-6">
+                            <label for="message" class="block text-gray-300 mb-2">Message</label>
+                            <textarea id="message" rows="5"
+                                class="contact-input w-full px-4 py-3 rounded-lg border border-gray-700 focus:outline-none focus:border-primary"></textarea>
+                        </div>
+
+                        <div class="flex justify-center">
+                            <button type="submit" id="sendButton"
+                                class="hero-btn bg-transparent border-2 border-primary text-white hover:bg-primary px-8 py-3 rounded-full font-medium transition duration-300 transform">
+
+                                <span id="btnText">Send Message</span>
+
+                                <svg id="checkIcon" class="hidden w-5 h-5 inline ml-2" fill="none" stroke="white"
+                                    stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </button>
+                        </div>
+
+
+                    </form>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="reveal h-full">
+                    <div class="bg-gray-800 rounded-xl p-8 h-full">
+                        <!-- Heading -->
+                        <h4 class="text-xl font-bold text-white mb-6">Connect With Me</h4>
+
+                        <!-- Social Icons -->
+                        <div class="flex space-x-8 mb-10">
+                            <a href="#"
+                                class="social-icon w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition">
+                                <!-- GitHub -->
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z">
+                                    </path>
+                                </svg>
+                            </a>
+
+                            <a href="https://www.linkedin.com/in/ritik-mangal-625b66243" target="_blank"
+                                class="social-icon w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition">
+                                <!-- LinkedIn -->
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z">
+                                    </path>
+                                </svg>
+                            </a>
+
+                            <a href="#"
+                                class="social-icon w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition">
+                                <!-- Twitter -->
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z">
+                                    </path>
+                                </svg>
+                            </a>
+
+                            <a href="#"
+                                class="social-icon w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition">
+                                <!-- Instagram -->
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z">
+                                    </path>
+                                </svg>
+                            </a>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <h3 class="text-xl font-bold text-white mb-6">Contact Information</h3>
+                        <div class="space-y-8  ">
+                            <!-- Email -->
+                            <div class="flex items-start">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-primary bg-opacity-20 flex items-center justify-center mr-4 mt-1">
+                                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-gray-300 mb-1">Email</h4>
+                                    <a href="mailto:mangalritik6@gmail.com"
+                                        class="text-primary hover:text-accent transition">mangalritik6@gmail.com</a>
+                                </div>
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="flex items-start">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-primary bg-opacity-20 flex items-center justify-center mr-4 mt-1">
+                                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-gray-300 mb-1">Phone</h4>
+                                    <a href="tel:+918103370087"
+                                        class="text-primary hover:text-accent transition">8103370087</a>
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="flex items-start">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-primary bg-opacity-20 flex items-center justify-center mr-4 mt-1">
+                                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-gray-300 mb-1">Location</h4>
+                                    <p class="text-gray-400">Noida, UP</p>
+                                </div>
+                            </div>
+                            <div class="w-full h-40 rounded-xl overflow-hidden">
+                                <iframe
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3503.3832673503134!2d77.33130967536547!3d28.570410291487627!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce50003041557%3A0x104f71da1a17a248!2sNIELIT%20Noida!5e0!3m2!1sen!2sin!4v1719976671327!5m2!1sen!2sin"
+                                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 px-6 py-6">
+
+        <!-- Bottom line -->
+        <div class="text-center text-s text-gray-500" data-aos="fade-up" data-aos-delay="300">
+            © 2025 @Ritik Mangal. All rights reserved.
+        </div>
+
+        <!-- Back to Top Button inside footer -->
+        <div>
+            <button id="back-to-top" class="fixed bottom-4 right-6"
+                style="background-color: #5f5fc0; border-radius: 20px; padding: 10px;"
+                class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white shadow-lg hover:bg-accent transition opacity-0 invisible">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                </svg>
+            </button>
+        </div>
+
+    </footer>
+
+
+    <!-- Scripts -->
+    <script>
+        // Name rainbow animation
+        const name = document.querySelector('.hero-text span');
+        let hue = 0;
+        setInterval(() => {
+            hue = (hue + 1) % 360;
+            name.style.color = `hsl(${hue}, 100%, 50%)`;
+        }, 50);
+
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+
+                    // Close mobile menu if open
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+
+        // Highlight Active Nav Link on Scroll
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+
+                if (pageYOffset >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active-link');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active-link');
+                }
+            });
+
+            // Show/hide back to top button
+            const backToTop = document.getElementById('back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.classList.remove('opacity-0', 'invisible');
+                backToTop.classList.add('opacity-100', 'visible');
+            } else {
+                backToTop.classList.remove('opacity-100', 'visible');
+                backToTop.classList.add('opacity-0', 'invisible');
+            }
+        });
+
+        // Back to Top Button
+        document.getElementById('back-to-top').addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Scroll Animation
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = () => {
+            revealElements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        window.addEventListener('load', revealOnScroll);
+
+        // 3D Background Animation
+        const canvasContainer = document.getElementById('canvas-container');
+        let canvas, scene, camera, renderer, particles;
+
+        const initThreeJS = () => {
+            // Create scene
+            scene = new THREE.Scene();
+
+            // Create camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+
+            // Create renderer
+            canvas = document.createElement('canvas');
+            renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            canvasContainer.appendChild(renderer.domElement);
+
+            // Create particles
+            const particleCount = 1500;
+            particles = new THREE.BufferGeometry();
+
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 200;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
+
+                colors[i * 3] = 0.2 + Math.random() * 0.3; // R
+                colors[i * 3 + 1] = 0.5 + Math.random() * 0.3; // G
+                colors[i * 3 + 2] = 0.9 + Math.random() * 0.1; // B
+            }
+
+            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const particleMaterial = new THREE.PointsMaterial({
+                size: 1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true
+            });
+
+            const particleMesh = new THREE.Points(particles, particleMaterial);
+            scene.add(particleMesh);
+
+            // Animation loop
+            const animate = () => {
+                requestAnimationFrame(animate);
+
+                particleMesh.rotation.x += 0.0005;
+                particleMesh.rotation.y += 0.001;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+        };
+
+        // Handle window resize
+        const handleResize = () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Reveal elements on load
+            revealOnScroll();
+
+            // Initialize 3D background
+            initThreeJS();
+        });
+    </script>
+</body>
+
+</html>
